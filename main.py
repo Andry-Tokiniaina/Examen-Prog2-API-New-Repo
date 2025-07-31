@@ -7,7 +7,6 @@ import datetime
 
 app = FastAPI()
 
-
 class PostModel(BaseModel):
     author : str
     title : str
@@ -15,6 +14,12 @@ class PostModel(BaseModel):
     creation_datetime : datetime.datetime
 
 post_list : List[PostModel] = []
+
+def serialized_posts():
+    posts_converted = []
+    for post in post_list:
+        posts_converted.append(post.model_dump())
+    return posts_converted
 
 @app.get("/ping")
 def root():
@@ -25,9 +30,10 @@ def home():
     return Response(content="<h1>Welcome home!</h1>", status_code=200, media_type="text/html")
 
 @app.post("/posts")
-def new_post(posts : List[PostModel]):
-    post_list.extend(PostModel.model_validate(post) for post in posts)
-    return Response(content={"posts":[post.model_dump() for post in post_list]}, status_code=200, media_type="application/json")
+def new_post(posts: List[PostModel]):
+    global post_list
+    post_list.extend(posts)
+    return Response(content=serialized_posts(), status_code=201, media_type="text/plain")
 
 @app.get("/posts")
 def get_posts():
