@@ -33,11 +33,11 @@ def home():
 def new_post(posts: List[PostModel]):
     global post_list
     post_list.extend(posts)
-    return Response(content=serialized_posts(), status_code=201, media_type="text/plain")
+    return JSONResponse({"posts" : [post.model_dump() for post in post_list]}, status_code=201)
 
 @app.get("/posts")
 def get_posts():
-    return Response(content=[post_list], status_code=200, media_type="text/plain")
+    return {"posts": serialized_posts()}
 
 @app.put("/posts")
 def update_posts(posts: List[PostModel]):
@@ -51,6 +51,7 @@ def update_posts(posts: List[PostModel]):
                 break
         if not found:
             post_list.append(new_post)
+    return {"posts": serialized_posts()}
 
 @app.get("/{full_path:path}")
 def catch_all(full_path: str):
