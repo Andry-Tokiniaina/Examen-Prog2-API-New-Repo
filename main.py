@@ -33,7 +33,7 @@ def home():
 def new_post(posts: List[PostModel]):
     global post_list
     post_list.extend(posts)
-    return JSONResponse({"posts" : [post.model_dump() for post in post_list]}, status_code=201)
+    return {"posts": serialized_posts()}
 
 @app.get("/posts")
 def get_posts():
